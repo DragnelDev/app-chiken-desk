@@ -11,3 +11,63 @@ html, body {
 * {
   scrollbar-width: thin;
 }
+
+/* ---------- Componentes reutilizables (Tailwind @apply) ---------- */
+@layer components {
+  .card {
+    @apply rounded-xl2 bg-surface-light-card p-6 shadow-sm dark:bg-surface-dark-card;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-1 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white
+           transition-colors hover:bg-brand-hover disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-1 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium
+           text-gray-600 transition-colors hover:bg-gray-50 disabled:opacity-50
+           dark:border-surface-dark-border dark:text-gray-300 dark:hover:bg-surface-dark-border;
+  }
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-1 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium
+           text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50
+           dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-900/20;
+  }
+  .input {
+    @apply w-full rounded-lg border border-gray-200 bg-transparent px-3 py-2 text-sm text-gray-900 outline-none
+           focus:border-brand dark:border-surface-dark-border dark:text-white;
+  }
+  .label {
+    @apply mb-1 block text-xs font-semibold uppercase text-gray-400;
+  }
+  .th {
+    @apply pb-3 text-xs font-semibold uppercase text-gray-400 dark:text-gray-500;
+  }
+  .td {
+    @apply py-3 text-gray-700 dark:text-gray-200;
+  }
+  .badge {
+    @apply rounded-full px-2.5 py-1 text-xs font-semibold;
+  }
+}
+
+select.input option {
+  color: #111827;
+}
+
+/* ---------- Impresión de tickets (80 mm) ---------- */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+  .print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm;
+    color: #000;
+    background: #fff;
+  }
+}

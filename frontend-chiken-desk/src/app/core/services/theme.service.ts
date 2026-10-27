@@ -2,7 +2,7 @@ import { Injectable, signal } from '@angular/core';
 
 export type Theme = 'light' | 'dark';
 
-const STORAGE_KEY = 'nexusrest-theme';
+const STORAGE_KEY = 'chikendesk-theme';
 
 /**
  * Maneja el modo claro/oscuro de todo el sistema (Landing + Dashboard + POS + KDS).

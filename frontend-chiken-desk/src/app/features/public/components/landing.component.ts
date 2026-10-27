@@ -6,11 +6,7 @@ import { PublicMenuComponent } from './menu-section/menu-section.component';
 import { PublicContactoComponent } from './contacto-section/contacto-section.component';
 import { PublicFooterComponent } from './footer/footer.component';
 
-/**
- * Landing pública de NexusRest — Hero, Nosotros, Menú (GET /productos) y
- * Contacto/Reservas (POST /reservas), tal como describe el Informe de
- * Implementación (sección 3: "¿Cómo interactúan tus clientes con NexusRest?").
- */
+/** Landing pública de ChikenDesk: Hero, Nosotros, Menú (GET /productos) y Contacto. */
 @Component({
   selector: 'app-landing',
   standalone: true,

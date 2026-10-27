@@ -27,7 +27,7 @@ export class LoginComponent {
       .subscribe({
         next: () => {
           this.cargando.set(false);
-          this.router.navigate(['/admin/resumen']);
+          this.router.navigate([this.auth.rutaInicio()]);
         },
         error: (error: HttpErrorResponse) => {
           this.cargando.set(false);
