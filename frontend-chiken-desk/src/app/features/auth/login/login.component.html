@@ -1,0 +1,51 @@
+<div
+  class="flex min-h-screen items-center justify-center bg-surface-light px-4 transition-colors dark:bg-surface-dark"
+>
+  <form
+    (ngSubmit)="submit()"
+    class="w-full max-w-sm rounded-xl2 bg-surface-light-card p-8 shadow-sm dark:bg-surface-dark-card"
+  >
+    <div class="mb-6 flex items-center gap-2">
+      <div class="flex h-9 w-9 items-center justify-center rounded-full bg-brand text-lg">🌀</div>
+      <span class="text-lg font-bold text-gray-900 dark:text-white">RestoBrand</span>
+    </div>
+
+    <h1 class="mb-1 text-xl font-bold text-gray-900 dark:text-white">Acceso de personal</h1>
+    <p class="mb-6 text-sm text-gray-500 dark:text-gray-400">
+      Ingresa tus credenciales para entrar al panel.
+    </p>
+
+    <label class="mb-1 block text-xs font-semibold uppercase text-gray-400">Usuario</label>
+    <input
+      type="text"
+      name="usuario"
+      [(ngModel)]="usuario"
+      required
+      class="mb-4 w-full rounded-lg border border-gray-200 bg-transparent px-3 py-2.5 text-sm text-gray-900
+             outline-none focus:border-brand dark:border-surface-dark-border dark:text-white"
+    />
+
+    <label class="mb-1 block text-xs font-semibold uppercase text-gray-400">Contraseña</label>
+    <input
+      type="password"
+      name="password"
+      [(ngModel)]="password"
+      required
+      class="mb-4 w-full rounded-lg border border-gray-200 bg-transparent px-3 py-2.5 text-sm text-gray-900
+             outline-none focus:border-brand dark:border-surface-dark-border dark:text-white"
+    />
+
+    @if (error()) {
+      <p class="mb-4 text-sm font-medium text-red-500">{{ error() }}</p>
+    }
+
+    <button
+      type="submit"
+      [disabled]="cargando()"
+      class="w-full rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white
+             transition-colors hover:bg-brand-hover disabled:opacity-60"
+    >
+      {{ cargando() ? 'Ingresando...' : 'Ingresar' }}
+    </button>
+  </form>
+</div>

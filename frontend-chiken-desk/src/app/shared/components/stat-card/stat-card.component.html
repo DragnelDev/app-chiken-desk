@@ -1,0 +1,16 @@
+<div
+  class="rounded-xl2 border border-transparent bg-surface-light-card p-6 shadow-sm
+         dark:border-surface-dark-border dark:bg-surface-dark-card"
+>
+  <p class="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
+    {{ label() }}
+  </p>
+  <p class="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
+    {{ value() }}
+  </p>
+  @if (hint()) {
+    <p class="mt-1 text-sm font-medium" [class]="hintClass">
+      {{ hint() }}
+    </p>
+  }
+</div>
