@@ -24,7 +24,12 @@ export interface ResumenDashboard {
   cajasAbiertas: number;
   productosStockBajo: number;
   ventasPorMetodoHoy: { metodoPago: string; total: number; cantidad: number }[];
-  topProductos7Dias: { idProducto: number; nombre: string; unidades: number; total: number }[];
+  topProductos7Dias: {
+    idProducto: number;
+    nombre: string;
+    unidades: number;
+    total: number;
+  }[];
 }
 
 @Injectable()
@@ -65,7 +70,10 @@ export class DashboardService {
         ORDER BY unidades DESC LIMIT 5`,
     );
 
-    const variacion = ayer.total > 0 ? round2(((hoy.total - ayer.total) / ayer.total) * 100) : null;
+    const variacion =
+      ayer.total > 0
+        ? round2(((hoy.total - ayer.total) / ayer.total) * 100)
+        : null;
 
     return {
       ventasHoy: round2(hoy.total),

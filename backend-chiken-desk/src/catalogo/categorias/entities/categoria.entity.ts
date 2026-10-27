@@ -4,7 +4,10 @@ import { ProductoEntity } from '../../productos/entities/producto.entity';
 
 @Entity('categorias')
 export class CategoriaEntity extends AuditBaseEntity {
-  @PrimaryGeneratedColumn({ name: 'id_categoria', generatedIdentity: 'ALWAYS' })
+  @PrimaryGeneratedColumn('identity', {
+    name: 'id_categoria',
+    generatedIdentity: 'ALWAYS',
+  })
   idCategoria: number;
 
   @Column({ type: 'varchar', length: 80 })

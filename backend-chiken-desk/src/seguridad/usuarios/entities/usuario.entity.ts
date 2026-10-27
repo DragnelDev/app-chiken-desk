@@ -11,7 +11,10 @@ import { RolEntity } from '../../roles/entities/rol.entity';
 
 @Entity('usuarios')
 export class UsuarioEntity extends AuditBaseEntity {
-  @PrimaryGeneratedColumn({ name: 'id_usuario', generatedIdentity: 'ALWAYS' })
+  @PrimaryGeneratedColumn('identity', {
+    name: 'id_usuario',
+    generatedIdentity: 'ALWAYS',
+  })
   idUsuario: number;
 
   @Index('idx_usuarios_id_rol')
@@ -31,7 +34,12 @@ export class UsuarioEntity extends AuditBaseEntity {
   usuario: string;
 
   /** select:false => nunca viaja en consultas normales ni en respuestas JSON. */
-  @Column({ name: 'password_hash', type: 'varchar', length: 255, select: false })
+  @Column({
+    name: 'password_hash',
+    type: 'varchar',
+    length: 255,
+    select: false,
+  })
   passwordHash: string;
 
   @ManyToOne(() => RolEntity, (rol) => rol.usuarios, { nullable: false })

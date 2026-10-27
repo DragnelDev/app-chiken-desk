@@ -57,14 +57,20 @@ export class ProductosController {
   @ApiBearerAuth()
   @Roles(RolSistema.ADMIN)
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateProductoDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateProductoDto,
+  ) {
     return this.service.update(id, dto);
   }
 
   @ApiBearerAuth()
   @Roles(RolSistema.ADMIN)
   @Patch(':id/stock')
-  ajustarStock(@Param('id', ParseIntPipe) id: number, @Body() dto: AjusteStockDto) {
+  ajustarStock(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: AjusteStockDto,
+  ) {
     return this.service.ajustarStock(id, dto);
   }
 

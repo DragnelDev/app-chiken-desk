@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpCode, Ip, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Public } from '../common/decorators/public.decorator';
-import { UsuarioAutenticado } from '../common/interfaces/usuario-autenticado.interface';
+import type { UsuarioAutenticado } from '../common/interfaces/usuario-autenticado.interface';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 

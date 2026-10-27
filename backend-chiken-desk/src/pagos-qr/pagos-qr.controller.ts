@@ -8,12 +8,17 @@ import {
   ParseIntPipe,
   Post,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiHeader,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Public } from '../common/decorators/public.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolSistema } from '../common/enums';
-import { UsuarioAutenticado } from '../common/interfaces/usuario-autenticado.interface';
+import type { UsuarioAutenticado } from '../common/interfaces/usuario-autenticado.interface';
 import { ConfirmarQrWebhookDto } from './dto/pago-qr.dto';
 import { PagosQrService } from './pagos-qr.service';
 
@@ -24,22 +29,36 @@ export class PagosQrController {
 
   @ApiBearerAuth()
   @Post('venta/:idVenta')
-  @ApiOperation({ summary: 'Generar (o reutilizar el vigente) el QR de una venta' })
-  generar(@Param('idVenta', ParseIntPipe) idVenta: number, @CurrentUser() user: UsuarioAutenticado) {
+  @ApiOperation({
+    summary: 'Generar (o reutilizar el vigente) el QR de una venta',
+  })
+  generar(
+    @Param('idVenta', ParseIntPipe) idVenta: number,
+    @CurrentUser() user: UsuarioAutenticado,
+  ) {
     return this.service.generar(idVenta, user);
   }
 
   @ApiBearerAuth()
   @Get('venta/:idVenta')
-  @ApiOperation({ summary: 'Estado del último pago QR (ideal para sondeo; no incluye la imagen)' })
-  estado(@Param('idVenta', ParseIntPipe) idVenta: number, @CurrentUser() user: UsuarioAutenticado) {
+  @ApiOperation({
+    summary:
+      'Estado del último pago QR (ideal para sondeo; no incluye la imagen)',
+  })
+  estado(
+    @Param('idVenta', ParseIntPipe) idVenta: number,
+    @CurrentUser() user: UsuarioAutenticado,
+  ) {
     return this.service.consultar(idVenta, user, false);
   }
 
   @ApiBearerAuth()
   @Get('venta/:idVenta/qr')
   @ApiOperation({ summary: 'Último pago QR incluyendo la imagen' })
-  conImagen(@Param('idVenta', ParseIntPipe) idVenta: number, @CurrentUser() user: UsuarioAutenticado) {
+  conImagen(
+    @Param('idVenta', ParseIntPipe) idVenta: number,
+    @CurrentUser() user: UsuarioAutenticado,
+  ) {
     return this.service.consultar(idVenta, user, true);
   }
 
@@ -47,8 +66,13 @@ export class PagosQrController {
   @Roles(RolSistema.ADMIN)
   @Post(':id/confirmar-manual')
   @HttpCode(200)
-  @ApiOperation({ summary: 'Confirmación manual por un supervisor (sandbox / contingencia)' })
-  confirmarManual(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UsuarioAutenticado) {
+  @ApiOperation({
+    summary: 'Confirmación manual por un supervisor (sandbox / contingencia)',
+  })
+  confirmarManual(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: UsuarioAutenticado,
+  ) {
     return this.service.confirmarManual(id, user);
   }
 

@@ -13,7 +13,10 @@ import { AperturaCajaEntity } from '../../aperturas-caja/entities/apertura-caja.
 
 @Entity('movimientos_caja')
 export class MovimientoCajaEntity extends AuditBaseEntity {
-  @PrimaryGeneratedColumn({ name: 'id_movimiento', generatedIdentity: 'ALWAYS' })
+  @PrimaryGeneratedColumn('identity', {
+    name: 'id_movimiento',
+    generatedIdentity: 'ALWAYS',
+  })
   idMovimiento: number;
 
   @Index('idx_movimientos_caja_id_apertura')
@@ -23,13 +26,20 @@ export class MovimientoCajaEntity extends AuditBaseEntity {
   @Column({ name: 'tipo_movimiento', type: 'varchar', length: 10 })
   tipoMovimiento: TipoMovimiento;
 
-  @Column({ type: 'numeric', precision: 12, scale: 2, transformer: numericTransformer })
+  @Column({
+    type: 'numeric',
+    precision: 12,
+    scale: 2,
+    transformer: numericTransformer,
+  })
   monto: number;
 
   @Column({ type: 'varchar', length: 255 })
   concepto: string;
 
-  @ManyToOne(() => AperturaCajaEntity, (a) => a.movimientos, { nullable: false })
+  @ManyToOne(() => AperturaCajaEntity, (a) => a.movimientos, {
+    nullable: false,
+  })
   @JoinColumn({ name: 'id_apertura' })
   apertura: AperturaCajaEntity;
 }

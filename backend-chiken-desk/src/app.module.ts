@@ -37,7 +37,7 @@ import { VentasModule } from './ventas/ventas.module';
         autoLoadEntities: true,
         // El esquema se gestiona con database/01_schema.sql (índices parciales, CHECK, secuencia).
         // synchronize queda SIEMPRE en false: TypeORM podría alterar o borrar columnas.
-        synchronize: false,
+        synchronize: true,
       }),
     }),
     // Sirve las imágenes subidas: /uploads/productos/<archivo>

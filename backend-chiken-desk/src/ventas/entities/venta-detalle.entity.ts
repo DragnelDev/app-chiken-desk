@@ -13,7 +13,10 @@ import { VentaEntity } from './venta.entity';
 
 @Entity('ventas_detalle')
 export class VentaDetalleEntity extends AuditBaseEntity {
-  @PrimaryGeneratedColumn({ name: 'id_detalle', generatedIdentity: 'ALWAYS' })
+  @PrimaryGeneratedColumn('identity', {
+    name: 'id_detalle',
+    generatedIdentity: 'ALWAYS',
+  })
   idDetalle: number;
 
   @Index('idx_ventas_detalle_id_venta')
@@ -37,7 +40,12 @@ export class VentaDetalleEntity extends AuditBaseEntity {
   })
   precioUnitario: number;
 
-  @Column({ type: 'numeric', precision: 12, scale: 2, transformer: numericTransformer })
+  @Column({
+    type: 'numeric',
+    precision: 12,
+    scale: 2,
+    transformer: numericTransformer,
+  })
   subtotal: number;
 
   @Column({ type: 'varchar', length: 255, nullable: true })

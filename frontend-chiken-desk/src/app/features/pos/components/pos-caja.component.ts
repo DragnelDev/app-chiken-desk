@@ -28,7 +28,8 @@ import { CajaConResumen, MovimientoCaja, TipoMovimiento } from '../../../shared/
         <input class="input mb-4" type="number" min="0" step="0.01" [(ngModel)]="montoInicial" />
         <button type="button" class="btn w-full" [disabled]="montoInicial === null || montoInicial < 0 || procesando()" (click)="abrir()">Abrir caja</button>
       </div>
-    } @else if (caja(); as c) {
+    } @else {
+      @if (caja(); as c) {
       <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <section class="card">
           <div class="mb-3 flex items-center justify-between">
@@ -74,6 +75,7 @@ import { CajaConResumen, MovimientoCaja, TipoMovimiento } from '../../../shared/
           }
         </section>
       </div>
+      }
     }
 
     <!-- Cierre -->

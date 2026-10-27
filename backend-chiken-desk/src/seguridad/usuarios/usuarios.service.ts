@@ -50,7 +50,8 @@ export class UsuariosService {
       where: { idUsuario, estado: Estado.ACTIVO },
       relations: { rol: true },
     });
-    if (!usuario) throw new NotFoundException(`Usuario ${idUsuario} no encontrado`);
+    if (!usuario)
+      throw new NotFoundException(`Usuario ${idUsuario} no encontrado`);
     return usuario;
   }
 
@@ -69,17 +70,25 @@ export class UsuariosService {
   /** Para JwtStrategy: confirma que el usuario sigue activo y con su rol vigente. */
   findActivoConRol(idUsuario: number): Promise<UsuarioEntity | null> {
     return this.repo.findOne({
-      where: { idUsuario, estado: Estado.ACTIVO, rol: { estado: Estado.ACTIVO } },
+      where: {
+        idUsuario,
+        estado: Estado.ACTIVO,
+        rol: { estado: Estado.ACTIVO },
+      },
       relations: { rol: true },
     });
   }
 
-  async update(idUsuario: number, dto: UpdateUsuarioDto): Promise<UsuarioEntity> {
+  async update(
+    idUsuario: number,
+    dto: UpdateUsuarioDto,
+  ): Promise<UsuarioEntity> {
     const usuario = await this.findOne(idUsuario);
 
     if (dto.idRol !== undefined) await this.validarRol(dto.idRol);
     if (
-      (dto.usuario && dto.usuario.toLowerCase() !== usuario.usuario.toLowerCase()) ||
+      (dto.usuario &&
+        dto.usuario.toLowerCase() !== usuario.usuario.toLowerCase()) ||
       (dto.ci && dto.ci !== usuario.ci)
     ) {
       await this.validarUnicos(dto.usuario ?? '', dto.ci ?? '', idUsuario);
@@ -87,7 +96,8 @@ export class UsuariosService {
 
     const { password, ...datos } = dto;
     Object.assign(usuario, datos);
-    if (password) usuario.passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
+    if (password)
+      usuario.passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
     delete (usuario as Partial<UsuarioEntity>).rol; // evita sobrescribir id_rol con la relación vieja
 
     await this.repo.save(usuario);
@@ -123,7 +133,9 @@ export class UsuariosService {
     const repetido = await qb.getOne();
     if (repetido) {
       throw new ConflictException(
-        repetido.ci === ci && ci ? 'Ya existe un usuario con ese CI' : 'Ya existe ese nombre de usuario',
+        repetido.ci === ci && ci
+          ? 'Ya existe un usuario con ese CI'
+          : 'Ya existe ese nombre de usuario',
       );
     }
   }

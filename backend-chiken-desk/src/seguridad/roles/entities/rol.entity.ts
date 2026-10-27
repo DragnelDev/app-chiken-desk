@@ -4,7 +4,10 @@ import { UsuarioEntity } from '../../usuarios/entities/usuario.entity';
 
 @Entity('roles')
 export class RolEntity extends AuditBaseEntity {
-  @PrimaryGeneratedColumn({ name: 'id_rol', generatedIdentity: 'ALWAYS' })
+  @PrimaryGeneratedColumn('identity', {
+    name: 'id_rol',
+    generatedIdentity: 'ALWAYS',
+  })
   idRol: number;
 
   @Column({ type: 'varchar', length: 50 })

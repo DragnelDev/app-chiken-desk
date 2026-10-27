@@ -7,7 +7,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Estado } from '../../common/enums';
 import { ProductoEntity } from '../productos/entities/producto.entity';
-import { CreateCategoriaDto, UpdateCategoriaDto } from './dto/create-categoria.dto';
+import {
+  CreateCategoriaDto,
+  UpdateCategoriaDto,
+} from './dto/create-categoria.dto';
 import { CategoriaEntity } from './entities/categoria.entity';
 
 @Injectable()
@@ -21,27 +24,42 @@ export class CategoriasService {
 
   async create(dto: CreateCategoriaDto): Promise<CategoriaEntity> {
     await this.validarNombreLibre(dto.nombre);
-    return this.repo.save(this.repo.create({ ...dto, nombre: dto.nombre.trim() }));
+    return this.repo.save(
+      this.repo.create({ ...dto, nombre: dto.nombre.trim() }),
+    );
   }
 
   findAll(): Promise<CategoriaEntity[]> {
-    return this.repo.find({ where: { estado: Estado.ACTIVO }, order: { nombre: 'ASC' } });
+    return this.repo.find({
+      where: { estado: Estado.ACTIVO },
+      order: { nombre: 'ASC' },
+    });
   }
 
   async findOne(idCategoria: number): Promise<CategoriaEntity> {
     const categoria = await this.repo.findOne({
       where: { idCategoria, estado: Estado.ACTIVO },
     });
-    if (!categoria) throw new NotFoundException(`Categoría ${idCategoria} no encontrada`);
+    if (!categoria)
+      throw new NotFoundException(`Categoría ${idCategoria} no encontrada`);
     return categoria;
   }
 
-  async update(idCategoria: number, dto: UpdateCategoriaDto): Promise<CategoriaEntity> {
+  async update(
+    idCategoria: number,
+    dto: UpdateCategoriaDto,
+  ): Promise<CategoriaEntity> {
     const categoria = await this.findOne(idCategoria);
-    if (dto.nombre && dto.nombre.trim().toLowerCase() !== categoria.nombre.toLowerCase()) {
+    if (
+      dto.nombre &&
+      dto.nombre.trim().toLowerCase() !== categoria.nombre.toLowerCase()
+    ) {
       await this.validarNombreLibre(dto.nombre);
     }
-    Object.assign(categoria, { ...dto, nombre: dto.nombre?.trim() ?? categoria.nombre });
+    Object.assign(categoria, {
+      ...dto,
+      nombre: dto.nombre?.trim() ?? categoria.nombre,
+    });
     return this.repo.save(categoria);
   }
 
@@ -51,7 +69,9 @@ export class CategoriasService {
       where: { idCategoria, estado: Estado.ACTIVO },
     });
     if (productos > 0) {
-      throw new ConflictException(`La categoría tiene ${productos} producto(s) activo(s)`);
+      throw new ConflictException(
+        `La categoría tiene ${productos} producto(s) activo(s)`,
+      );
     }
     categoria.estado = Estado.BORRADO;
     await this.repo.save(categoria);
@@ -63,6 +83,7 @@ export class CategoriasService {
       .where('LOWER(c.nombre) = LOWER(:nombre)', { nombre: nombre.trim() })
       .andWhere('c.estado = :e', { e: Estado.ACTIVO })
       .getExists();
-    if (existe) throw new ConflictException(`Ya existe la categoría "${nombre}"`);
+    if (existe)
+      throw new ConflictException(`Ya existe la categoría "${nombre}"`);
   }
 }

@@ -1,6 +1,13 @@
 import { BadRequestException } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { closeSync, existsSync, mkdirSync, openSync, readSync, unlinkSync } from 'node:fs';
+import {
+  closeSync,
+  existsSync,
+  mkdirSync,
+  openSync,
+  readSync,
+  unlinkSync,
+} from 'node:fs';
 import { diskStorage } from 'multer';
 import { join } from 'node:path';
 
@@ -37,7 +44,10 @@ export function opcionesSubidaImagen() {
       cb: (error: Error | null, accept: boolean) => void,
     ) => {
       if (EXTENSION_POR_MIME[file.mimetype]) return cb(null, true);
-      cb(new BadRequestException('Solo se permiten imágenes JPG, PNG o WEBP'), false);
+      cb(
+        new BadRequestException('Solo se permiten imágenes JPG, PNG o WEBP'),
+        false,
+      );
     },
   };
 }
@@ -52,7 +62,9 @@ export function tieneFirmaDeImagen(rutaArchivo: string): boolean {
     closeSync(fd);
   }
   const jpeg = buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
-  const png = buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+  const png = buffer
+    .subarray(0, 8)
+    .equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
   const webp =
     buffer.subarray(0, 4).toString('ascii') === 'RIFF' &&
     buffer.subarray(8, 12).toString('ascii') === 'WEBP';

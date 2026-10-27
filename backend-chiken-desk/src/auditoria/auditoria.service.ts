@@ -30,31 +30,48 @@ export class AuditoriaService {
    */
   async registrar(datos: DatosLog, manager?: EntityManager): Promise<void> {
     try {
-      const repo = manager ? manager.getRepository(AuditoriaLogEntity) : this.repo;
+      const repo = manager
+        ? manager.getRepository(AuditoriaLogEntity)
+        : this.repo;
       await repo.insert({
         idUsuario: datos.idUsuario ?? null,
         tablaAfectada: datos.tabla,
         accion: datos.accion,
         valoresAnteriores:
-          datos.anteriores === undefined ? null : JSON.stringify(datos.anteriores),
+          datos.anteriores === undefined
+            ? null
+            : JSON.stringify(datos.anteriores),
         valoresNuevos:
           datos.nuevos === undefined ? null : JSON.stringify(datos.nuevos),
         ipOrigen: datos.ip ? datos.ip.slice(0, 45) : null,
       });
     } catch (error) {
-      this.logger.error(`No se pudo registrar auditoría: ${(error as Error).message}`);
+      this.logger.error(
+        `No se pudo registrar auditoría: ${(error as Error).message}`,
+      );
     }
   }
 
   async buscar(filtro: FiltroAuditoriaDto) {
     const { page = 1, limit = 50 } = filtro;
-    const qb = this.repo.createQueryBuilder('l').orderBy('l.fechaEvento', 'DESC');
+    const qb = this.repo
+      .createQueryBuilder('l')
+      .orderBy('l.fechaEvento', 'DESC');
 
-    if (filtro.tabla) qb.andWhere('l.tablaAfectada = :tabla', { tabla: filtro.tabla });
-    if (filtro.accion) qb.andWhere('l.accion = :accion', { accion: filtro.accion });
-    if (filtro.idUsuario) qb.andWhere('l.idUsuario = :u', { u: filtro.idUsuario });
-    if (filtro.desde) qb.andWhere('l.fechaEvento >= :desde', { desde: `${filtro.desde} 00:00:00` });
-    if (filtro.hasta) qb.andWhere('l.fechaEvento <= :hasta', { hasta: `${filtro.hasta} 23:59:59.999` });
+    if (filtro.tabla)
+      qb.andWhere('l.tablaAfectada = :tabla', { tabla: filtro.tabla });
+    if (filtro.accion)
+      qb.andWhere('l.accion = :accion', { accion: filtro.accion });
+    if (filtro.idUsuario)
+      qb.andWhere('l.idUsuario = :u', { u: filtro.idUsuario });
+    if (filtro.desde)
+      qb.andWhere('l.fechaEvento >= :desde', {
+        desde: `${filtro.desde} 00:00:00`,
+      });
+    if (filtro.hasta)
+      qb.andWhere('l.fechaEvento <= :hasta', {
+        hasta: `${filtro.hasta} 23:59:59.999`,
+      });
 
     const [data, total] = await qb
       .skip((page - 1) * limit)

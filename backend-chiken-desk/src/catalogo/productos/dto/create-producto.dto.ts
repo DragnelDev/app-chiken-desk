@@ -57,7 +57,8 @@ export class UpdateProductoDto extends PartialType(CreateProductoDto) {}
 export class AjusteStockDto {
   @ApiProperty({
     example: 20,
-    description: 'Cantidad a sumar (positiva) o restar (negativa) al stock actual',
+    description:
+      'Cantidad a sumar (positiva) o restar (negativa) al stock actual',
   })
   @IsInt()
   cantidad: number;

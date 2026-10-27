@@ -37,9 +37,14 @@ export class AperturasCajaService {
     @InjectDataSource() private readonly dataSource: DataSource,
   ) {}
 
-  async abrir(dto: AbrirCajaDto, user: UsuarioAutenticado): Promise<AperturaCajaEntity> {
+  async abrir(
+    dto: AbrirCajaDto,
+    user: UsuarioAutenticado,
+  ): Promise<AperturaCajaEntity> {
     if (await this.cajaAbiertaDe(user.idUsuario)) {
-      throw new ConflictException('Ya tienes una caja abierta. Ciérrala antes de abrir otra');
+      throw new ConflictException(
+        'Ya tienes una caja abierta. Ciérrala antes de abrir otra',
+      );
     }
     // El índice único parcial uq_aperturas_caja_abierta_por_usuario cubre la condición de carrera.
     return this.repo.save(
@@ -53,7 +58,11 @@ export class AperturasCajaService {
 
   cajaAbiertaDe(idUsuario: number): Promise<AperturaCajaEntity | null> {
     return this.repo.findOne({
-      where: { idUsuario, estadoCaja: EstadoCaja.ABIERTA, estado: Estado.ACTIVO },
+      where: {
+        idUsuario,
+        estadoCaja: EstadoCaja.ABIERTA,
+        estado: Estado.ACTIVO,
+      },
     });
   }
 
@@ -77,14 +86,23 @@ export class AperturasCajaService {
       .leftJoinAndSelect('a.usuario', 'u')
       .where('a.estado = :e', { e: Estado.ACTIVO })
       .orderBy('a.fechaApertura', 'DESC');
-    if (filtro.estadoCaja) qb.andWhere('a.estadoCaja = :ec', { ec: filtro.estadoCaja });
-    if (filtro.idUsuario) qb.andWhere('a.idUsuario = :iu', { iu: filtro.idUsuario });
+    if (filtro.estadoCaja)
+      qb.andWhere('a.estadoCaja = :ec', { ec: filtro.estadoCaja });
+    if (filtro.idUsuario)
+      qb.andWhere('a.idUsuario = :iu', { iu: filtro.idUsuario });
 
-    const [data, total] = await qb.skip((page - 1) * limit).take(limit).getManyAndCount();
+    const [data, total] = await qb
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
     return { data, total, page, limit };
   }
 
-  async cerrar(idApertura: number, dto: CerrarCajaDto, user: UsuarioAutenticado) {
+  async cerrar(
+    idApertura: number,
+    dto: CerrarCajaDto,
+    user: UsuarioAutenticado,
+  ) {
     const apertura = await this.findOne(idApertura);
     this.verificarAcceso(apertura, user);
     if (apertura.estadoCaja !== EstadoCaja.ABIERTA) {
@@ -99,7 +117,9 @@ export class AperturasCajaService {
     }
 
     apertura.montoCierre = dto.montoCierre;
-    apertura.montoDiferencia = round2(dto.montoCierre - resumen.efectivoEsperado);
+    apertura.montoDiferencia = round2(
+      dto.montoCierre - resumen.efectivoEsperado,
+    );
     apertura.fechaCierre = new Date();
     apertura.estadoCaja = EstadoCaja.CERRADA;
     await this.repo.save(apertura);
@@ -112,12 +132,21 @@ export class AperturasCajaService {
       where: { idApertura, estado: Estado.ACTIVO },
       relations: { usuario: true },
     });
-    if (!apertura) throw new NotFoundException(`Apertura de caja ${idApertura} no encontrada`);
+    if (!apertura)
+      throw new NotFoundException(
+        `Apertura de caja ${idApertura} no encontrada`,
+      );
     return apertura;
   }
 
-  verificarAcceso(apertura: AperturaCajaEntity, user: UsuarioAutenticado): void {
-    if (user.rol !== RolSistema.ADMIN && apertura.idUsuario !== user.idUsuario) {
+  verificarAcceso(
+    apertura: AperturaCajaEntity,
+    user: UsuarioAutenticado,
+  ): void {
+    if (
+      user.rol !== RolSistema.ADMIN &&
+      apertura.idUsuario !== user.idUsuario
+    ) {
       throw new ForbiddenException('Esta caja pertenece a otro usuario');
     }
   }
@@ -125,7 +154,10 @@ export class AperturasCajaService {
   /** Obtiene la caja abierta del usuario o falla (para vender / registrar movimientos). */
   async exigirCajaAbierta(idUsuario: number): Promise<AperturaCajaEntity> {
     const apertura = await this.cajaAbiertaDe(idUsuario);
-    if (!apertura) throw new BadRequestException('No tienes una caja abierta. Abre caja primero');
+    if (!apertura)
+      throw new BadRequestException(
+        'No tienes una caja abierta. Abre caja primero',
+      );
     return apertura;
   }
 
@@ -172,8 +204,10 @@ export class AperturasCajaService {
       [id],
     );
 
-    const por = (m: string) => ventas.find((v) => v.metodo_pago === m)?.total ?? 0;
-    const mov = (t: string) => movimientos.find((x) => x.tipo_movimiento === t)?.total ?? 0;
+    const por = (m: string) =>
+      ventas.find((v) => v.metodo_pago === m)?.total ?? 0;
+    const mov = (t: string) =>
+      movimientos.find((x) => x.tipo_movimiento === t)?.total ?? 0;
 
     const ventasEfectivo = por('EFECTIVO');
     const ingresos = mov('INGRESO');
@@ -190,7 +224,9 @@ export class AperturasCajaService {
       ventasAnuladas: anuladas?.cantidad ?? 0,
       ingresos,
       egresos,
-      efectivoEsperado: round2(apertura.montoInicial + ventasEfectivo + ingresos - egresos),
+      efectivoEsperado: round2(
+        apertura.montoInicial + ventasEfectivo + ingresos - egresos,
+      ),
       qrPendientes: pendientes?.cantidad ?? 0,
     };
   }

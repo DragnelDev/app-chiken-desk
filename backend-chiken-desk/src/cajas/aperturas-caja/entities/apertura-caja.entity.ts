@@ -15,7 +15,10 @@ import { MovimientoCajaEntity } from '../../movimientos-caja/entities/movimiento
 
 @Entity('aperturas_caja')
 export class AperturaCajaEntity extends AuditBaseEntity {
-  @PrimaryGeneratedColumn({ name: 'id_apertura', generatedIdentity: 'ALWAYS' })
+  @PrimaryGeneratedColumn('identity', {
+    name: 'id_apertura',
+    generatedIdentity: 'ALWAYS',
+  })
   idApertura: number;
 
   @Index('idx_aperturas_caja_id_usuario')
@@ -53,13 +56,23 @@ export class AperturaCajaEntity extends AuditBaseEntity {
   })
   montoDiferencia: number | null;
 
-  @Column({ name: 'fecha_apertura', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', update: false })
+  @Column({
+    name: 'fecha_apertura',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    update: false,
+  })
   fechaApertura: Date;
 
   @Column({ name: 'fecha_cierre', type: 'timestamp', nullable: true })
   fechaCierre: Date | null;
 
-  @Column({ name: 'estado_caja', type: 'varchar', length: 10, default: EstadoCaja.ABIERTA })
+  @Column({
+    name: 'estado_caja',
+    type: 'varchar',
+    length: 10,
+    default: EstadoCaja.ABIERTA,
+  })
   estadoCaja: EstadoCaja;
 
   @ManyToOne(() => UsuarioEntity, { nullable: false })

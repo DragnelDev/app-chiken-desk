@@ -4,7 +4,10 @@ import { IsEnum, IsInt, IsNumber, IsOptional, Max, Min } from 'class-validator';
 import { EstadoCaja } from '../../../common/enums';
 
 export class AbrirCajaDto {
-  @ApiProperty({ example: 200, description: 'Efectivo con el que inicia el turno' })
+  @ApiProperty({
+    example: 200,
+    description: 'Efectivo con el que inicia el turno',
+  })
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0)
   @Max(9999999999)
@@ -12,7 +15,10 @@ export class AbrirCajaDto {
 }
 
 export class CerrarCajaDto {
-  @ApiProperty({ example: 1350.5, description: 'Efectivo contado físicamente al cerrar' })
+  @ApiProperty({
+    example: 1350.5,
+    description: 'Efectivo contado físicamente al cerrar',
+  })
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0)
   @Max(9999999999)

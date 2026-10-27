@@ -14,7 +14,10 @@ import { Public } from '../../common/decorators/public.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RolSistema } from '../../common/enums';
 import { CategoriasService } from './categorias.service';
-import { CreateCategoriaDto, UpdateCategoriaDto } from './dto/create-categoria.dto';
+import {
+  CreateCategoriaDto,
+  UpdateCategoriaDto,
+} from './dto/create-categoria.dto';
 
 @ApiTags('Categorías')
 @Controller('categorias')
@@ -44,7 +47,10 @@ export class CategoriasController {
   @ApiBearerAuth()
   @Roles(RolSistema.ADMIN)
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateCategoriaDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateCategoriaDto,
+  ) {
     return this.service.update(id, dto);
   }
 

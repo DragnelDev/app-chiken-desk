@@ -7,7 +7,10 @@ import { VentasController } from './ventas.controller';
 import { VentasService } from './ventas.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([VentaEntity, VentaDetalleEntity]), PagosQrModule],
+  imports: [
+    TypeOrmModule.forFeature([VentaEntity, VentaDetalleEntity]),
+    PagosQrModule,
+  ],
   controllers: [VentasController],
   providers: [VentasService],
 })

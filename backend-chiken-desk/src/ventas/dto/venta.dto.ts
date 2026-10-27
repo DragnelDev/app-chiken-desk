@@ -58,7 +58,10 @@ export class CreateVentaDto {
   @MaxLength(20)
   clienteNitCi?: string;
 
-  @ApiPropertyOptional({ example: 0, description: 'Descuento total en moneda (no %)' })
+  @ApiPropertyOptional({
+    example: 0,
+    description: 'Descuento total en moneda (no %)',
+  })
   @IsOptional()
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0)
@@ -109,7 +112,9 @@ export class FiltroVentasDto {
   @IsInt()
   idApertura?: number;
 
-  @ApiPropertyOptional({ description: 'Solo ADMIN: un CAJERO siempre ve sus propias ventas' })
+  @ApiPropertyOptional({
+    description: 'Solo ADMIN: un CAJERO siempre ve sus propias ventas',
+  })
   @IsOptional()
   @Type(() => Number)
   @IsInt()

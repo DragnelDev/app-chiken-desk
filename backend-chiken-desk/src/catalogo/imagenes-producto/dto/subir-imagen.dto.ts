@@ -4,7 +4,8 @@ import { IsBoolean, IsOptional } from 'class-validator';
 
 export class SubirImagenDto {
   @ApiPropertyOptional({
-    description: 'Marcar como imagen principal (la primera imagen siempre lo es)',
+    description:
+      'Marcar como imagen principal (la primera imagen siempre lo es)',
   })
   @IsOptional()
   @Transform(({ value }) => value === true || value === 'true')

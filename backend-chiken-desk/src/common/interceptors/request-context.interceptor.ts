@@ -17,7 +17,8 @@ export class RequestContextInterceptor implements NestInterceptor {
       usuario: req.user
         ? { idUsuario: req.user.idUsuario, usuario: req.user.usuario }
         : undefined,
-      ip: typeof req.ip === 'string' ? req.ip.replace('::ffff:', '') : undefined,
+      ip:
+        typeof req.ip === 'string' ? req.ip.replace('::ffff:', '') : undefined,
     };
 
     // El handler se ejecuta al suscribirse: así queda dentro del contexto.

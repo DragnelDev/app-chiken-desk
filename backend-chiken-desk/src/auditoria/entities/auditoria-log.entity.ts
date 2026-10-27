@@ -5,7 +5,7 @@ import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 @Index('idx_auditoria_logs_tabla_fecha', ['tablaAfectada', 'fechaEvento'])
 export class AuditoriaLogEntity {
   // BIGINT llega como string desde pg
-  @PrimaryGeneratedColumn({
+  @PrimaryGeneratedColumn('identity', {
     name: 'id_log',
     type: 'bigint',
     generatedIdentity: 'ALWAYS',

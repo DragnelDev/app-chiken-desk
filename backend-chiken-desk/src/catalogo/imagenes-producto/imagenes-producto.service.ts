@@ -27,11 +27,14 @@ export class ImagenesProductoService {
     archivo: Express.Multer.File | undefined,
     esPrincipal?: boolean,
   ): Promise<ImagenProductoEntity> {
-    if (!archivo) throw new BadRequestException('Falta el archivo (campo "file")');
+    if (!archivo)
+      throw new BadRequestException('Falta el archivo (campo "file")');
 
     try {
       if (!tieneFirmaDeImagen(archivo.path)) {
-        throw new BadRequestException('El archivo no es una imagen JPG, PNG o WEBP válida');
+        throw new BadRequestException(
+          'El archivo no es una imagen JPG, PNG o WEBP válida',
+        );
       }
       const url = `${URL_BASE_PRODUCTOS}/${archivo.filename}`;
 
@@ -39,7 +42,8 @@ export class ImagenesProductoService {
         const producto = await manager.findOne(ProductoEntity, {
           where: { idProducto, estado: Estado.ACTIVO },
         });
-        if (!producto) throw new NotFoundException(`Producto ${idProducto} no encontrado`);
+        if (!producto)
+          throw new NotFoundException(`Producto ${idProducto} no encontrado`);
 
         const activas = await manager.find(ImagenProductoEntity, {
           where: { idProducto, estado: Estado.ACTIVO },
@@ -86,13 +90,19 @@ export class ImagenesProductoService {
       const hermanas = await manager.find(ImagenProductoEntity, {
         where: { idProducto: imagen.idProducto, estado: Estado.ACTIVO },
       });
-      for (const otra of hermanas.filter((i) => i.esPrincipal && i.idImagen !== idImagen)) {
+      for (const otra of hermanas.filter(
+        (i) => i.esPrincipal && i.idImagen !== idImagen,
+      )) {
         otra.esPrincipal = false;
         await manager.save(otra);
       }
       imagen.esPrincipal = true;
       await manager.save(imagen);
-      await this.sincronizarProducto(manager, imagen.idProducto, imagen.urlImagen);
+      await this.sincronizarProducto(
+        manager,
+        imagen.idProducto,
+        imagen.urlImagen,
+      );
       return imagen;
     });
   }
@@ -116,7 +126,11 @@ export class ImagenesProductoService {
           siguiente.esPrincipal = true;
           await manager.save(siguiente);
         }
-        await this.sincronizarProducto(manager, imagen.idProducto, siguiente?.urlImagen ?? null);
+        await this.sincronizarProducto(
+          manager,
+          imagen.idProducto,
+          siguiente?.urlImagen ?? null,
+        );
       }
     });
   }
@@ -125,7 +139,8 @@ export class ImagenesProductoService {
     const imagen = await manager.findOne(ImagenProductoEntity, {
       where: { idImagen, estado: Estado.ACTIVO },
     });
-    if (!imagen) throw new NotFoundException(`Imagen ${idImagen} no encontrada`);
+    if (!imagen)
+      throw new NotFoundException(`Imagen ${idImagen} no encontrada`);
     return imagen;
   }
 
@@ -134,7 +149,9 @@ export class ImagenesProductoService {
     idProducto: number,
     url: string | null,
   ) {
-    const producto = await manager.findOne(ProductoEntity, { where: { idProducto } });
+    const producto = await manager.findOne(ProductoEntity, {
+      where: { idProducto },
+    });
     if (producto) {
       producto.imagenPrincipalUrl = url;
       await manager.save(producto);

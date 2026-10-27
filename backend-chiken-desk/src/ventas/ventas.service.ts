@@ -25,7 +25,11 @@ import { round2 } from '../common/utils/numeric.transformer';
 import { RequestContext } from '../common/utils/request-context';
 import { PagoQrEntity } from '../pagos-qr/entities/pago-qr.entity';
 import { PagosQrService } from '../pagos-qr/pagos-qr.service';
-import { AnularVentaDto, CreateVentaDto, FiltroVentasDto } from './dto/venta.dto';
+import {
+  AnularVentaDto,
+  CreateVentaDto,
+  FiltroVentasDto,
+} from './dto/venta.dto';
 import { VentaDetalleEntity } from './entities/venta-detalle.entity';
 import { VentaEntity } from './entities/venta.entity';
 
@@ -50,22 +54,35 @@ export class VentasService {
   async crear(dto: CreateVentaDto, user: UsuarioAutenticado) {
     const idVenta = await this.dataSource.transaction(async (manager) => {
       const apertura = await manager.findOne(AperturaCajaEntity, {
-        where: { idUsuario: user.idUsuario, estadoCaja: EstadoCaja.ABIERTA, estado: Estado.ACTIVO },
+        where: {
+          idUsuario: user.idUsuario,
+          estadoCaja: EstadoCaja.ABIERTA,
+          estado: Estado.ACTIVO,
+        },
       });
-      if (!apertura) throw new BadRequestException('Debes abrir caja antes de vender');
+      if (!apertura)
+        throw new BadRequestException('Debes abrir caja antes de vender');
 
       // cantidad total por producto (puede repetirse con distintas observaciones)
       const totales = new Map<number, number>();
       for (const d of dto.detalles) {
-        totales.set(d.idProducto, (totales.get(d.idProducto) ?? 0) + d.cantidad);
+        totales.set(
+          d.idProducto,
+          (totales.get(d.idProducto) ?? 0) + d.cantidad,
+        );
       }
 
-      const productos = await this.bloquearProductos(manager, [...totales.keys()]);
+      const productos = await this.bloquearProductos(manager, [
+        ...totales.keys(),
+      ]);
       const porId = new Map(productos.map((p) => [p.idProducto, p]));
 
       for (const [idProducto, cantidad] of totales) {
         const producto = porId.get(idProducto);
-        if (!producto) throw new BadRequestException(`El producto ${idProducto} no existe o está inactivo`);
+        if (!producto)
+          throw new BadRequestException(
+            `El producto ${idProducto} no existe o está inactivo`,
+          );
         if (producto.stock < cantidad) {
           throw new BadRequestException(
             `Stock insuficiente de "${producto.nombre}" (disponible: ${producto.stock})`,
@@ -87,7 +104,9 @@ export class VentasService {
       const montoSubtotal = round2(lineas.reduce((s, l) => s + l.subtotal, 0));
       const montoDescuento = round2(dto.montoDescuento ?? 0);
       if (montoDescuento > montoSubtotal) {
-        throw new BadRequestException('El descuento no puede superar el subtotal');
+        throw new BadRequestException(
+          'El descuento no puede superar el subtotal',
+        );
       }
 
       for (const [idProducto, cantidad] of totales) {
@@ -113,7 +132,9 @@ export class VentasService {
       );
 
       await manager.save(
-        lineas.map((l) => manager.create(VentaDetalleEntity, { ...l, idVenta: venta.idVenta })),
+        lineas.map((l) =>
+          manager.create(VentaDetalleEntity, { ...l, idVenta: venta.idVenta }),
+        ),
       );
       return venta.idVenta;
     });
@@ -126,7 +147,9 @@ export class VentasService {
         pagoQr = await this.pagosQr.generarParaVenta(venta);
       } catch (error) {
         // La venta ya existe: el cajero puede reintentar con POST /pagos-qr/venta/:id
-        this.logger.error(`No se pudo generar el QR de la venta ${idVenta}: ${(error as Error).message}`);
+        this.logger.error(
+          `No se pudo generar el QR de la venta ${idVenta}: ${(error as Error).message}`,
+        );
       }
     }
     return { ...venta, pagoQr };
@@ -141,14 +164,19 @@ export class VentasService {
         lock: { mode: 'pessimistic_write' },
       });
       if (!venta) throw new NotFoundException(`Venta ${idVenta} no encontrada`);
-      if (venta.estadoVenta === EstadoVenta.ANULADA) throw new ConflictException('La venta ya está anulada');
+      if (venta.estadoVenta === EstadoVenta.ANULADA)
+        throw new ConflictException('La venta ya está anulada');
       if (user.rol !== RolSistema.ADMIN && venta.idUsuario !== user.idUsuario) {
         throw new ForbiddenException('Solo puedes anular tus propias ventas');
       }
 
-      const apertura = await manager.findOneByOrFail(AperturaCajaEntity, { idApertura: venta.idApertura });
+      const apertura = await manager.findOneByOrFail(AperturaCajaEntity, {
+        idApertura: venta.idApertura,
+      });
       if (apertura.estadoCaja !== EstadoCaja.ABIERTA) {
-        throw new ConflictException('La caja de esta venta ya fue cerrada; no se puede anular');
+        throw new ConflictException(
+          'La caja de esta venta ya fue cerrada; no se puede anular',
+        );
       }
 
       // devolver stock
@@ -156,15 +184,25 @@ export class VentasService {
         where: { idVenta, estado: Estado.ACTIVO },
       });
       const devolver = new Map<number, number>();
-      for (const d of detalles) devolver.set(d.idProducto, (devolver.get(d.idProducto) ?? 0) + d.cantidad);
-      const productos = await this.bloquearProductos(manager, [...devolver.keys()], false);
+      for (const d of detalles)
+        devolver.set(
+          d.idProducto,
+          (devolver.get(d.idProducto) ?? 0) + d.cantidad,
+        );
+      const productos = await this.bloquearProductos(
+        manager,
+        [...devolver.keys()],
+        false,
+      );
       for (const producto of productos) {
         producto.stock += devolver.get(producto.idProducto)!;
         await manager.save(producto);
       }
 
       // pagos QR: los pendientes dejan de ser cobrables
-      const pagos = await manager.find(PagoQrEntity, { where: { idVenta, estado: Estado.ACTIVO } });
+      const pagos = await manager.find(PagoQrEntity, {
+        where: { idVenta, estado: Estado.ACTIVO },
+      });
       for (const pago of pagos) {
         if (pago.estadoPago === EstadoPagoQr.PENDIENTE) {
           pago.estadoPago = EstadoPagoQr.EXPIRADO;
@@ -183,7 +221,11 @@ export class VentasService {
           idUsuario: user.idUsuario,
           tabla: 'ventas',
           accion: AccionAuditoria.ANULACION_VENTA,
-          anteriores: { id_venta: idVenta, estado_venta: EstadoVenta.COMPLETADA, monto_total: montoTotal },
+          anteriores: {
+            id_venta: idVenta,
+            estado_venta: EstadoVenta.COMPLETADA,
+            monto_total: montoTotal,
+          },
           nuevos: {
             id_venta: idVenta,
             estado_venta: EstadoVenta.ANULADA,
@@ -215,16 +257,30 @@ export class VentasService {
       .orderBy('v.idVenta', 'DESC');
 
     // un cajero solo ve lo suyo; el admin puede filtrar por usuario
-    if (user.rol !== RolSistema.ADMIN) qb.andWhere('v.idUsuario = :me', { me: user.idUsuario });
-    else if (filtro.idUsuario) qb.andWhere('v.idUsuario = :iu', { iu: filtro.idUsuario });
+    if (user.rol !== RolSistema.ADMIN)
+      qb.andWhere('v.idUsuario = :me', { me: user.idUsuario });
+    else if (filtro.idUsuario)
+      qb.andWhere('v.idUsuario = :iu', { iu: filtro.idUsuario });
 
-    if (filtro.estadoVenta) qb.andWhere('v.estadoVenta = :ev', { ev: filtro.estadoVenta });
-    if (filtro.metodoPago) qb.andWhere('v.metodoPago = :mp', { mp: filtro.metodoPago });
-    if (filtro.idApertura) qb.andWhere('v.idApertura = :ia', { ia: filtro.idApertura });
-    if (filtro.desde) qb.andWhere('v.fechaRegistro >= :desde', { desde: `${filtro.desde} 00:00:00` });
-    if (filtro.hasta) qb.andWhere('v.fechaRegistro <= :hasta', { hasta: `${filtro.hasta} 23:59:59.999` });
+    if (filtro.estadoVenta)
+      qb.andWhere('v.estadoVenta = :ev', { ev: filtro.estadoVenta });
+    if (filtro.metodoPago)
+      qb.andWhere('v.metodoPago = :mp', { mp: filtro.metodoPago });
+    if (filtro.idApertura)
+      qb.andWhere('v.idApertura = :ia', { ia: filtro.idApertura });
+    if (filtro.desde)
+      qb.andWhere('v.fechaRegistro >= :desde', {
+        desde: `${filtro.desde} 00:00:00`,
+      });
+    if (filtro.hasta)
+      qb.andWhere('v.fechaRegistro <= :hasta', {
+        hasta: `${filtro.hasta} 23:59:59.999`,
+      });
 
-    const [data, total] = await qb.skip((page - 1) * limit).take(limit).getManyAndCount();
+    const [data, total] = await qb
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
     return { data, total, page, limit };
   }
 
@@ -249,9 +305,16 @@ export class VentasService {
   }
 
   /** SELECT ... FOR UPDATE ordenado por id (evita bloqueos cruzados entre ventas simultáneas). */
-  private bloquearProductos(manager: EntityManager, ids: number[], soloActivos = true) {
+  private bloquearProductos(
+    manager: EntityManager,
+    ids: number[],
+    soloActivos = true,
+  ) {
     return manager.find(ProductoEntity, {
-      where: { idProducto: In(ids), ...(soloActivos ? { estado: Estado.ACTIVO } : {}) },
+      where: {
+        idProducto: In(ids),
+        ...(soloActivos ? { estado: Estado.ACTIVO } : {}),
+      },
       order: { idProducto: 'ASC' },
       lock: { mode: 'pessimistic_write' },
     });
@@ -259,7 +322,9 @@ export class VentasService {
 
   /** Ticket correlativo: T-YYYYMMDD-000123 (la secuencia vive en PostgreSQL). */
   private async siguienteTicket(manager: EntityManager): Promise<string> {
-    const [{ n }] = await manager.query(`SELECT nextval('seq_numero_ticket') AS n`);
+    const [{ n }] = await manager.query(
+      `SELECT nextval('seq_numero_ticket') AS n`,
+    );
     const hoy = new Date();
     const fecha = `${hoy.getFullYear()}${String(hoy.getMonth() + 1).padStart(2, '0')}${String(hoy.getDate()).padStart(2, '0')}`;
     return `T-${fecha}-${String(n).padStart(6, '0')}`;

@@ -14,7 +14,10 @@ import { ImagenProductoEntity } from '../../imagenes-producto/entities/imagen-pr
 
 @Entity('productos')
 export class ProductoEntity extends AuditBaseEntity {
-  @PrimaryGeneratedColumn({ name: 'id_producto', generatedIdentity: 'ALWAYS' })
+  @PrimaryGeneratedColumn('identity', {
+    name: 'id_producto',
+    generatedIdentity: 'ALWAYS',
+  })
   idProducto: number;
 
   @Index('idx_productos_id_categoria')
@@ -42,14 +45,25 @@ export class ProductoEntity extends AuditBaseEntity {
   @Column({ type: 'int', default: 0 })
   stock: number;
 
-  @Column({ name: 'permite_cambio_guarnicion', type: 'boolean', default: false })
+  @Column({
+    name: 'permite_cambio_guarnicion',
+    type: 'boolean',
+    default: false,
+  })
   permiteCambioGuarnicion: boolean;
 
   /** Ruta relativa de la imagen principal, ej: /uploads/productos/3f9a...webp */
-  @Column({ name: 'imagen_principal_url', type: 'varchar', length: 500, nullable: true })
+  @Column({
+    name: 'imagen_principal_url',
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+  })
   imagenPrincipalUrl: string | null;
 
-  @ManyToOne(() => CategoriaEntity, (categoria) => categoria.productos, { nullable: false })
+  @ManyToOne(() => CategoriaEntity, (categoria) => categoria.productos, {
+    nullable: false,
+  })
   @JoinColumn({ name: 'id_categoria' })
   categoria: CategoriaEntity;
 

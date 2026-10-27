@@ -45,7 +45,7 @@ npm install
 npm start                   # http://localhost:4200 (proxy a /api y /uploads)
 ```
 
-**Usuario inicial:** `admin` / `Admin123*` (cámbiala al primer ingreso). Crea cajeros desde _Usuarios_.
+**Usuario inicial:** `admin` / `Admin123*`. Se crea automáticamente al iniciar el backend si todavía no existe una cuenta `admin` activa; la semilla SQL de Docker también lo crea en instalaciones nuevas. Cambia la contraseña después del primer inicio de sesión. Crea cajeros desde _Usuarios_.
 
 ## Flujo de trabajo típico
 

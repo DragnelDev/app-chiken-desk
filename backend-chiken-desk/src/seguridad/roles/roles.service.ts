@@ -20,22 +20,32 @@ export class RolesService {
 
   async create(dto: CreateRolDto): Promise<RolEntity> {
     await this.validarNombreLibre(dto.nombre);
-    return this.repo.save(this.repo.create({ ...dto, nombre: dto.nombre.trim() }));
+    return this.repo.save(
+      this.repo.create({ ...dto, nombre: dto.nombre.trim() }),
+    );
   }
 
   findAll(): Promise<RolEntity[]> {
-    return this.repo.find({ where: { estado: Estado.ACTIVO }, order: { idRol: 'ASC' } });
+    return this.repo.find({
+      where: { estado: Estado.ACTIVO },
+      order: { idRol: 'ASC' },
+    });
   }
 
   async findOne(idRol: number): Promise<RolEntity> {
-    const rol = await this.repo.findOne({ where: { idRol, estado: Estado.ACTIVO } });
+    const rol = await this.repo.findOne({
+      where: { idRol, estado: Estado.ACTIVO },
+    });
     if (!rol) throw new NotFoundException(`Rol ${idRol} no encontrado`);
     return rol;
   }
 
   async update(idRol: number, dto: UpdateRolDto): Promise<RolEntity> {
     const rol = await this.findOne(idRol);
-    if (dto.nombre && dto.nombre.trim().toLowerCase() !== rol.nombre.toLowerCase()) {
+    if (
+      dto.nombre &&
+      dto.nombre.trim().toLowerCase() !== rol.nombre.toLowerCase()
+    ) {
       await this.validarNombreLibre(dto.nombre);
     }
     Object.assign(rol, { ...dto, nombre: dto.nombre?.trim() ?? rol.nombre });
@@ -48,7 +58,9 @@ export class RolesService {
       where: { idRol, estado: Estado.ACTIVO },
     });
     if (enUso > 0) {
-      throw new ConflictException(`El rol tiene ${enUso} usuario(s) activo(s) asignados`);
+      throw new ConflictException(
+        `El rol tiene ${enUso} usuario(s) activo(s) asignados`,
+      );
     }
     rol.estado = Estado.BORRADO; // borrado lógico
     await this.repo.save(rol);

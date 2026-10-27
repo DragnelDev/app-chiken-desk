@@ -31,7 +31,8 @@ export class AuditSubscriber implements EntitySubscriberInterface {
   }
 
   beforeInsert(event: InsertEvent<any>): void {
-    const columna = event.metadata.findColumnWithPropertyName('usuarioRegistro');
+    const columna =
+      event.metadata.findColumnWithPropertyName('usuarioRegistro');
     if (columna && event.entity && !event.entity.usuarioRegistro) {
       event.entity.usuarioRegistro =
         RequestContext.get()?.usuario?.usuario?.slice(0, 50) ?? 'sistema';
@@ -50,7 +51,8 @@ export class AuditSubscriber implements EntitySubscriberInterface {
   }
 
   async afterUpdate(event: UpdateEvent<any>): Promise<void> {
-    if (this.omitir(event.metadata) || !event.entity || !event.databaseEntity) return;
+    if (this.omitir(event.metadata) || !event.entity || !event.databaseEntity)
+      return;
 
     const cambiadas = event.updatedColumns.filter(
       (c) => c.databaseName !== 'fecha_registro',
@@ -68,8 +70,9 @@ export class AuditSubscriber implements EntitySubscriberInterface {
     const antes: Record<string, unknown> = {};
     const despues: Record<string, unknown> = {};
     for (const col of event.metadata.primaryColumns) {
-      antes[col.databaseName] = despues[col.databaseName] =
-        col.getEntityValue(event.databaseEntity);
+      antes[col.databaseName] = despues[col.databaseName] = col.getEntityValue(
+        event.databaseEntity,
+      );
     }
     for (const col of cambiadas) {
       if (SENSIBLES.has(col.databaseName)) {
@@ -101,7 +104,10 @@ export class AuditSubscriber implements EntitySubscriberInterface {
     return metadata.tableName === 'auditoria_logs';
   }
 
-  private valores(metadata: EntityMetadata, entidad: any): Record<string, unknown> {
+  private valores(
+    metadata: EntityMetadata,
+    entidad: any,
+  ): Record<string, unknown> {
     const salida: Record<string, unknown> = {};
     for (const col of metadata.columns) {
       salida[col.databaseName] = SENSIBLES.has(col.databaseName)

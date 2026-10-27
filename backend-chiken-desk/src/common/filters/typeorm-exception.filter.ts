@@ -44,6 +44,8 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
         this.logger.error(exception.message, exception.stack);
     }
 
-    res.status(status).json({ statusCode: status, message, error: 'DatabaseError' });
+    res
+      .status(status)
+      .json({ statusCode: status, message, error: 'DatabaseError' });
   }
 }

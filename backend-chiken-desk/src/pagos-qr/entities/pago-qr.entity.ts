@@ -13,7 +13,10 @@ import { VentaEntity } from '../../ventas/entities/venta.entity';
 
 @Entity('pagos_qr')
 export class PagoQrEntity extends AuditBaseEntity {
-  @PrimaryGeneratedColumn({ name: 'id_pago_qr', generatedIdentity: 'ALWAYS' })
+  @PrimaryGeneratedColumn('identity', {
+    name: 'id_pago_qr',
+    generatedIdentity: 'ALWAYS',
+  })
   idPagoQr: number;
 
   @Index('idx_pagos_qr_id_venta')
@@ -24,13 +27,28 @@ export class PagoQrEntity extends AuditBaseEntity {
   transaccionId: string;
 
   /** Data URL (data:image/png;base64,...). select:false: no viaja en consultas de sondeo. */
-  @Column({ name: 'qr_imagen_base64', type: 'text', nullable: true, select: false })
+  @Column({
+    name: 'qr_imagen_base64',
+    type: 'text',
+    nullable: true,
+    select: false,
+  })
   qrImagenBase64: string | null;
 
-  @Column({ type: 'numeric', precision: 12, scale: 2, transformer: numericTransformer })
+  @Column({
+    type: 'numeric',
+    precision: 12,
+    scale: 2,
+    transformer: numericTransformer,
+  })
   monto: number;
 
-  @Column({ name: 'estado_pago', type: 'varchar', length: 10, default: EstadoPagoQr.PENDIENTE })
+  @Column({
+    name: 'estado_pago',
+    type: 'varchar',
+    length: 10,
+    default: EstadoPagoQr.PENDIENTE,
+  })
   estadoPago: EstadoPagoQr;
 
   @Column({ name: 'fecha_expiracion', type: 'timestamp' })

@@ -6,7 +6,10 @@ import { MovimientosCajaController } from './movimientos-caja.controller';
 import { MovimientosCajaService } from './movimientos-caja.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([MovimientoCajaEntity]), AperturasCajaModule],
+  imports: [
+    TypeOrmModule.forFeature([MovimientoCajaEntity]),
+    AperturasCajaModule,
+  ],
   controllers: [MovimientosCajaController],
   providers: [MovimientosCajaService],
 })

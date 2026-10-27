@@ -26,7 +26,9 @@ export class MovimientosCajaService {
 
     this.cajas.verificarAcceso(apertura, user);
     if (apertura.estadoCaja !== EstadoCaja.ABIERTA) {
-      throw new ConflictException('No se pueden registrar movimientos en una caja cerrada');
+      throw new ConflictException(
+        'No se pueden registrar movimientos en una caja cerrada',
+      );
     }
 
     return this.repo.save(
@@ -52,12 +54,15 @@ export class MovimientosCajaService {
     const movimiento = await this.repo.findOne({
       where: { idMovimiento, estado: Estado.ACTIVO },
     });
-    if (!movimiento) throw new NotFoundException(`Movimiento ${idMovimiento} no encontrado`);
+    if (!movimiento)
+      throw new NotFoundException(`Movimiento ${idMovimiento} no encontrado`);
 
     const apertura = await this.cajas.findOne(movimiento.idApertura);
     this.cajas.verificarAcceso(apertura, user);
     if (apertura.estadoCaja !== EstadoCaja.ABIERTA) {
-      throw new ConflictException('La caja ya está cerrada; no se puede anular el movimiento');
+      throw new ConflictException(
+        'La caja ya está cerrada; no se puede anular el movimiento',
+      );
     }
 
     movimiento.estado = Estado.BORRADO; // borrado lógico

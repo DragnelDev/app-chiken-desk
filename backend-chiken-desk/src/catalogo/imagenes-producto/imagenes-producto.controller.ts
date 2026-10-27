@@ -12,7 +12,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Public } from '../../common/decorators/public.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RolSistema } from '../../common/enums';
@@ -34,7 +40,9 @@ export class ImagenesProductoController {
   @ApiBearerAuth()
   @Roles(RolSistema.ADMIN)
   @Post('productos/:idProducto/imagenes')
-  @ApiOperation({ summary: 'Subir imagen (multipart/form-data, campo "file", máx. 2 MB)' })
+  @ApiOperation({
+    summary: 'Subir imagen (multipart/form-data, campo "file", máx. 2 MB)',
+  })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {

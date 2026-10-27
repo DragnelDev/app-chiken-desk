@@ -37,6 +37,8 @@ database/           01_schema.sql (esquema) · 02_seed.sql (datos iniciales)
 
 Swagger interactivo en `/apidoc`.
 
+Al iniciar el backend, si no existe un usuario `admin` activo, se crean el rol `ADMIN` (si hace falta) y el usuario inicial `admin` / `Admin123*`. Cambia esta contraseña después del primer inicio de sesión.
+
 ## Auditoría automática
 
 `AuditSubscriber` (TypeORM) hace dos cosas sin que el código de negocio lo pida:

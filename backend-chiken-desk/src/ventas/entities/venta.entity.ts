@@ -24,7 +24,10 @@ const dinero = {
 
 @Entity('ventas')
 export class VentaEntity extends AuditBaseEntity {
-  @PrimaryGeneratedColumn({ name: 'id_venta', generatedIdentity: 'ALWAYS' })
+  @PrimaryGeneratedColumn('identity', {
+    name: 'id_venta',
+    generatedIdentity: 'ALWAYS',
+  })
   idVenta: number;
 
   @Index('idx_ventas_id_apertura')
@@ -38,10 +41,20 @@ export class VentaEntity extends AuditBaseEntity {
   @Column({ name: 'numero_factura_ticket', type: 'varchar', length: 30 })
   numeroFacturaTicket: string;
 
-  @Column({ name: 'cliente_nombre', type: 'varchar', length: 150, nullable: true })
+  @Column({
+    name: 'cliente_nombre',
+    type: 'varchar',
+    length: 150,
+    nullable: true,
+  })
   clienteNombre: string | null;
 
-  @Column({ name: 'cliente_nit_ci', type: 'varchar', length: 20, nullable: true })
+  @Column({
+    name: 'cliente_nit_ci',
+    type: 'varchar',
+    length: 20,
+    nullable: true,
+  })
   clienteNitCi: string | null;
 
   @Column({ name: 'tipo_pedido', type: 'varchar', length: 10 })
@@ -59,7 +72,12 @@ export class VentaEntity extends AuditBaseEntity {
   @Column({ name: 'metodo_pago', type: 'varchar', length: 10 })
   metodoPago: MetodoPago;
 
-  @Column({ name: 'estado_venta', type: 'varchar', length: 10, default: EstadoVenta.COMPLETADA })
+  @Column({
+    name: 'estado_venta',
+    type: 'varchar',
+    length: 10,
+    default: EstadoVenta.COMPLETADA,
+  })
   estadoVenta: EstadoVenta;
 
   @ManyToOne(() => AperturaCajaEntity, { nullable: false })

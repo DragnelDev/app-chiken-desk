@@ -13,7 +13,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RolSistema } from '../../common/enums';
-import { UsuarioAutenticado } from '../../common/interfaces/usuario-autenticado.interface';
+import type { UsuarioAutenticado } from '../../common/interfaces/usuario-autenticado.interface';
 import { CreateUsuarioDto, UpdateUsuarioDto } from './dto/create-usuario.dto';
 import { UsuariosService } from './usuarios.service';
 
@@ -46,7 +46,10 @@ export class UsuariosController {
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() actual: UsuarioAutenticado) {
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() actual: UsuarioAutenticado,
+  ) {
     return this.service.remove(id, actual.idUsuario);
   }
 }
