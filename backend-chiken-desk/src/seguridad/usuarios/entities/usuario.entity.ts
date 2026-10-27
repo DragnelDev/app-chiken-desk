@@ -1,37 +1,40 @@
-import { AuditBaseEntity } from 'src/common/audit-base.entity';
-import { EmpleadoEntity } from 'src/seguridad/empleados/entities/empleado.entity';
-import { RoleEntity } from 'src/seguridad/roles/entities/role.entity';
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
+  Entity,
+  Index,
   JoinColumn,
-  OneToOne,
+  ManyToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
+import { AuditBaseEntity } from '../../../common/audit-base.entity';
+import { RolEntity } from '../../roles/entities/rol.entity';
 
 @Entity('usuarios')
 export class UsuarioEntity extends AuditBaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn({ name: 'id_usuario', generatedIdentity: 'ALWAYS' })
+  idUsuario: number;
 
-  @Column({ type: 'varchar', length: 50, unique: true })
+  @Index('idx_usuarios_id_rol')
+  @Column({ name: 'id_rol', type: 'int' })
+  idRol: number;
+
+  @Column({ type: 'varchar', length: 100 })
+  nombres: string;
+
+  @Column({ type: 'varchar', length: 100 })
+  apellidos: string;
+
+  @Column({ type: 'varchar', length: 20 })
+  ci: string;
+
+  @Column({ type: 'varchar', length: 50 })
   usuario: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  password_hash: string;
+  /** select:false => nunca viaja en consultas normales ni en respuestas JSON. */
+  @Column({ name: 'password_hash', type: 'varchar', length: 255, select: false })
+  passwordHash: string;
 
-  @Column({ name: 'rol_id', type: 'int' })
-  rolId: number;
-
-  @Column({ name: 'empleado_id', type: 'int' })
-  empleadoId: number;
-
-  @ManyToOne(() => RoleEntity, (rol) => rol.usuarios)
-  @JoinColumn({ name: 'rol_id' })
-  rol: RoleEntity;
-
-  @OneToOne(() => EmpleadoEntity, (empleado) => empleado.usuario)
-  @JoinColumn({ name: 'empleado_id' })
-  empleado: EmpleadoEntity;
+  @ManyToOne(() => RolEntity, (rol) => rol.usuarios, { nullable: false })
+  @JoinColumn({ name: 'id_rol' })
+  rol: RolEntity;
 }

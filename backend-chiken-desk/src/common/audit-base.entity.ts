@@ -1,18 +1,23 @@
-import { Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Column } from 'typeorm';
 
+/**
+ * Auditoría estándar de ChikenDesk para tablas de negocio.
+ *  - estado: 1 = activo, 0 = borrado lógico (soft delete)
+ *  - usuario_registro: lo completa AuditSubscriber (usuario del JWT, o 'sistema')
+ *  - fecha_registro: la resuelve PostgreSQL con CURRENT_TIMESTAMP
+ */
 export abstract class AuditBaseEntity {
-  @CreateDateColumn({ name: 'creado_en', type: 'timestamp' })
-  creadoEn: Date;
+  @Column({ name: 'estado', type: 'int', default: 1 })
+  estado: number;
 
-  @Column({ name: 'creado_por', type: 'int', nullable: true })
-  creadoPor: number;
+  @Column({ name: 'usuario_registro', type: 'varchar', length: 50 })
+  usuarioRegistro: string;
 
-  @UpdateDateColumn({ name: 'actualizado_en', type: 'timestamp' })
-  actualizadoEn: Date;
-
-  @Column({ name: 'actualizado_por', type: 'int', nullable: true })
-  actualizadoPor: number;
-
-  @Column({ name: 'activo', type: 'boolean', default: true })
-  activo: boolean;
+  @Column({
+    name: 'fecha_registro',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    update: false,
+  })
+  fechaRegistro: Date;
 }

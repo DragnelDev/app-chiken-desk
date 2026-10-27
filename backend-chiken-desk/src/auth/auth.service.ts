@@ -1,49 +1,64 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsuariosService } from '../seguridad/usuarios/usuarios.service';
 import * as bcrypt from 'bcrypt';
+import { AccionAuditoria } from '../common/enums';
+import { AuditoriaService } from '../auditoria/auditoria.service';
+import { UsuariosService } from '../seguridad/usuarios/usuarios.service';
 import { LoginDto } from './dto/login.dto';
-import { UsuarioEntity } from '../seguridad/usuarios/entities/usuario.entity';
 
 @Injectable()
 export class AuthService {
+  // Hash de relleno: evita que el tiempo de respuesta delate si el usuario existe.
+  private readonly hashDummy = bcrypt.hashSync('chikendesk-dummy', 10);
+
   constructor(
     private readonly usuariosService: UsuariosService,
     private readonly jwtService: JwtService,
+    private readonly auditoria: AuditoriaService,
   ) {}
 
-  async validateUser(
-    username: string,
-    pass: string,
-  ): Promise<Omit<UsuarioEntity, 'password_hash'> | null> {
-    const usuario = await this.usuariosService.findByUsuario(username);
+  async login(dto: LoginDto, ip?: string) {
+    const usuario = await this.usuariosService.findParaLogin(dto.usuario);
+    const coincide = await bcrypt.compare(
+      dto.password,
+      usuario?.passwordHash ?? this.hashDummy,
+    );
 
-    if (usuario && (await bcrypt.compare(pass, usuario.password_hash))) {
-      const { password_hash, ...result } = usuario;
-      return result;
-    }
-    return null;
-  }
-
-  async login(loginDto: LoginDto) {
-    const user = await this.usuariosService.findByUsuario(loginDto.usuario);
-
-    if (
-      !user ||
-      !(await bcrypt.compare(loginDto.password, user.password_hash))
-    ) {
+    if (!usuario || !coincide) {
+      await this.auditoria.registrar({
+        idUsuario: usuario?.idUsuario ?? null,
+        tabla: 'usuarios',
+        accion: AccionAuditoria.LOGIN,
+        nuevos: { usuario: dto.usuario, resultado: 'FALLIDO' },
+        ip,
+      });
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    const payload = { sub: user.id, username: user.usuario, rolId: user.rolId };
+    await this.auditoria.registrar({
+      idUsuario: usuario.idUsuario,
+      tabla: 'usuarios',
+      accion: AccionAuditoria.LOGIN,
+      nuevos: { usuario: usuario.usuario, resultado: 'EXITOSO' },
+      ip,
+    });
+
+    const payload = {
+      sub: usuario.idUsuario,
+      usuario: usuario.usuario,
+      idRol: usuario.idRol,
+      rol: usuario.rol.nombre,
+    };
 
     return {
       token: this.jwtService.sign(payload),
       usuario: {
-        id: user.id,
-        usuario: user.usuario,
-        rol: user.rol?.nombre,
-        empleadoId: user.empleadoId,
+        idUsuario: usuario.idUsuario,
+        usuario: usuario.usuario,
+        nombres: usuario.nombres,
+        apellidos: usuario.apellidos,
+        idRol: usuario.idRol,
+        rol: usuario.rol.nombre,
       },
     };
   }

@@ -1,42 +1,52 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  HttpCode,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { RolSistema } from '../../common/enums';
+import { UsuarioAutenticado } from '../../common/interfaces/usuario-autenticado.interface';
+import { CreateUsuarioDto, UpdateUsuarioDto } from './dto/create-usuario.dto';
 import { UsuariosService } from './usuarios.service';
-import { CreateUsuarioDto } from './dto/create-usuario.dto';
-import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 
+@ApiTags('Usuarios')
+@ApiBearerAuth()
+@Roles(RolSistema.ADMIN)
 @Controller('usuarios')
 export class UsuariosController {
-  constructor(private readonly usuariosService: UsuariosService) {}
+  constructor(private readonly service: UsuariosService) {}
 
   @Post()
-  create(@Body() createUsuarioDto: CreateUsuarioDto) {
-    return this.usuariosService.create(createUsuarioDto);
+  create(@Body() dto: CreateUsuarioDto) {
+    return this.service.create(dto);
   }
 
   @Get()
   findAll() {
-    return this.usuariosService.findAll();
+    return this.service.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usuariosService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.service.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUsuarioDto: UpdateUsuarioDto) {
-    return this.usuariosService.update(+id, updateUsuarioDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUsuarioDto) {
+    return this.service.update(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usuariosService.remove(+id);
+  @HttpCode(204)
+  remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() actual: UsuarioAutenticado) {
+    return this.service.remove(id, actual.idUsuario);
   }
 }
