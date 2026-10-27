@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres:16
+    container_name: chikendesk-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: chikendesk
+      TZ: America/La_Paz
+      PGTZ: America/La_Paz
+    ports:
+      - '5432:5432'
+    volumes:
+      - chikendesk-data:/var/lib/postgresql/data
+      # Se ejecutan en orden alfabético la primera vez que se crea el volumen
+      - ./database/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./database/02_seed.sql:/docker-entrypoint-initdb.d/02_seed.sql:ro
+volumes:
+  chikendesk-data:

@@ -1,34 +1,33 @@
-# NexusRestFrontend
+# ChikenDesk · Frontend
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.17.
+Angular 17 (componentes standalone, signals, control flow `@if/@for`) + Tailwind.
+Ver el [README general](../README.md).
 
-## Development server
+```bash
+npm install
+npm start      # http://localhost:4200  (proxy.conf.json: /api y /uploads -> http://localhost:3000)
+```
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Rutas
 
-## Backend connection and login
+| Ruta                                 | Rol                                                                       |
+| ------------------------------------ | ------------------------------------------------------------------------- |
+| `/`                                  | público: landing con el menú real                                         |
+| `/login`                             | público                                                                   |
+| `/admin/*`                           | ADMIN: resumen, productos, categorías, ventas, cajas, usuarios, auditoría |
+| `/pos` · `/pos/caja` · `/pos/ventas` | CAJERO (y ADMIN): vender, mi caja, mis ventas                             |
 
-The frontend calls the API through `/api` and the Angular development proxy
-forwards those requests to `http://localhost:3000`. Start the NestJS backend
-before logging in. The login endpoint is `POST /api/v1/auth/login`; send a JSON
-body with `usuario` and `password`.
+## Estructura
 
-## Code scaffolding
+```
+src/app/
+├─ core/       config (API_URL), guards, interceptor JWT, servicios (api.services.ts) y utilidades
+├─ shared/     modelos TS, modal, ticket imprimible (80 mm), sidebar, historial de ventas
+└─ features/   public · auth · admin · pos
+```
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Notas
 
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+- La sesión se guarda en `localStorage` (`chikendesk-token`) y el guard comprueba que el JWT no haya vencido.
+- Subida de imágenes: `FormData` con el campo `file`; no se fija `Content-Type` (el navegador agrega el boundary).
+- En producción sirve `/api` y `/uploads` desde el mismo dominio (o ajusta `API_URL` y la URL de las imágenes).

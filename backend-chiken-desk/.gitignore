@@ -54,3 +54,13 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+
+# Otros
+/dist
+/node_modules
+.env
+uploads/productos/*
+!uploads/productos/.gitkeep
+*.log
+coverage
